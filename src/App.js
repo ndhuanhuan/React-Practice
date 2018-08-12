@@ -65,14 +65,20 @@ class App extends Component {
     this.setState({searchTerm: event.target.value})
   }
 
-  onDismiss(id) {
-    function isNotId(item) {
-      return item.objectID !== id;
-    }
+onDismiss(id) {
+  // function isNotId(item) {
+  //   return item.objectID !== id;
+  // }
+  //
+  // const updatedList = this.state.list.filter(isNotId);
+  // this.setState({list: updatedList});
 
-    const updatedList = this.state.list.filter(isNotId);
-    this.setState({list: updatedList});
-  }
+
+  const isNotId = item => item.objectID !== id;
+  const updatedHits = this.state.result.hits.filter(isNotId);
+  //this.state.result is a complex object, we only want to modify hits property and assign to a new object
+  this.setState({result: Object.assign({}, this.state.result, {hits: updatedHits})});
+}
 
   // render() {
   //   const { searchTerm, list } = this.state;
