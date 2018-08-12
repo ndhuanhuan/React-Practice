@@ -26,7 +26,7 @@ const PARAM_SEARCH = 'query=';
 // ];
 
 function isSearched(searchTerm) {
-  return function (item) {
+  return function(item) {
     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
   }
 }
@@ -37,7 +37,7 @@ class App extends Component {
 
     this.state = {
       result: null,
-      searchTerm: DEFAULT_QUERY,
+      searchTerm: DEFAULT_QUERY
     };
 
     this.searchTopStories = this.setSearchTopStories.bind(this);
@@ -46,14 +46,11 @@ class App extends Component {
   }
 
   setSearchTopStories(result) {
-    this.setState({ result });
+    this.setState({result});
   }
 
   fetchSearchTopStories(searchTerm) {
-    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
-      .then(response => response.json())
-      .then(result => this.setSearchTopStories(result))
-      .catch(e => e);
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`).then(response => response.json()).then(result => this.setSearchTopStories(result)).catch(e => e);
   }
 
   componentDidMount() {
@@ -65,20 +62,19 @@ class App extends Component {
     this.setState({searchTerm: event.target.value})
   }
 
-onDismiss(id) {
-  // function isNotId(item) {
-  //   return item.objectID !== id;
-  // }
-  //
-  // const updatedList = this.state.list.filter(isNotId);
-  // this.setState({list: updatedList});
+  onDismiss(id) {
+    // function isNotId(item) {
+    //   return item.objectID !== id;
+    // }
+    //
+    // const updatedList = this.state.list.filter(isNotId);
+    // this.setState({list: updatedList});
 
-
-  const isNotId = item => item.objectID !== id;
-  const updatedHits = this.state.result.hits.filter(isNotId);
-  //this.state.result is a complex object, we only want to modify hits property and assign to a new object
-  this.setState({result: Object.assign({}, this.state.result, {hits: updatedHits})});
-}
+    const isNotId = item => item.objectID !== id;
+    const updatedHits = this.state.result.hits.filter(isNotId);
+    //this.state.result is a complex object, we only want to modify hits property and assign to a new object
+    this.setState({result: Object.assign({}, this.state.result, {hits: updatedHits})});
+  }
 
   // render() {
   //   const { searchTerm, list } = this.state;
@@ -107,17 +103,13 @@ onDismiss(id) {
 
   render() {
     const {searchTerm, result} = this.state;
-
-    if(!result) { return null; }
-    return (<div className="App">
-      <Search value={searchTerm} onChange={this.onSearchChange}>
-        Search
-      </Search>
-      <Table
-        list={result.hits}
-        pattern={searchTerm}
-        onDismiss={this.onDismiss}
-      />
+    return (<div className="page">
+      <div className="interactions">
+        <Search value={searchTerm} onChange={this.onSearchChange}>
+          Search
+        </Search>
+      </div>
+      {result && <Table list={result.hits} pattern={searchTerm} onDismiss={this.onDismiss}/>}
     </div>);
   }
 }
@@ -127,8 +119,7 @@ const Search = ({value, onChange, children}) => <form>
   <input type="text" value={value} onChange={onChange}/>
 </form>
 
-const Table = ({list, pattern, onDismiss}) =>
-<div className="table">
+const Table = ({list, pattern, onDismiss}) => <div className="table">
   {
     list.filter(isSearched(pattern)).map(item => <div key={item.objectID} className="table-row">
       <span style={{
@@ -164,7 +155,11 @@ const Table = ({list, pattern, onDismiss}) =>
 
 class Button extends Component {
   render() {
-    const {onClick, className = '', children} = this.props;
+    const {
+      onClick,
+      className = '',
+      children
+    } = this.props;
     return (<button onClick={onClick} className={className} type="button">
       {children}
     </button>);
