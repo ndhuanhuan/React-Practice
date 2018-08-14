@@ -46,6 +46,7 @@ class App extends Component {
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
       error: null,
+      isLoading: false,
     };
 
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
@@ -73,11 +74,16 @@ class App extends Component {
       results: {
         ...results,
         [searchKey]: { hits: updatedHits, page }
-      }
+      },
+      isLoading: false
     });
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
+    this.setState({
+      isLoading: true
+    });
+
     axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       //.then(response => response.json())
       .then(result => this._isMounted && this.setSearchTopStories(result.data))
@@ -152,7 +158,7 @@ class App extends Component {
   // }
 
   render() {
-    const { searchTerm, results, searchKey, error } = this.state;
+    const { searchTerm, results, searchKey, error, isLoading } = this.state;
     const page = ( results && results[searchKey] && results[searchKey].page ) || 0;
     const list = ( results && results[searchKey] && results[searchKey].hits ) || [];
 
@@ -176,20 +182,32 @@ class App extends Component {
           />
       }
       <div className="interactions">
-        <Button onClick={() => this.fetchSearchTopStories(searchKey, page+1)}>
+      { isLoading
+        ? <Loading />
+        : <Button onClick={() => this.fetchSearchTopStories(searchKey, page+1)}>
           More
         </Button>
+      }
       </div>
     </div>);
   }
 }
 
-const Search = ({value, onChange, onSubmit, children}) => <form onSubmit={onSubmit}>
-  <input type="text" value={value} onChange={onChange}/>
-  <button type="submit">
-    {children}
-  </button>
-</form>
+const Loading = () => <div> Loading ... </div>
+
+class Search extends Component {
+  render() {
+    const {value, onChange, onSubmit, children} = this.props;
+    return (<form onSubmit={onSubmit}>
+      <input type="text" value={value} onChange={onChange} ref={(node) => {
+          this.input = node;
+        }}/>
+      <button type="submit">
+        {children}
+      </button>
+    </form>);
+  }
+}
 
 const Table = ({list, onDismiss}) => <div className="table">
   {
